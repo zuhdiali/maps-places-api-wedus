@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Service` ADD COLUMN `status` INTEGER NOT NULL DEFAULT 0;
