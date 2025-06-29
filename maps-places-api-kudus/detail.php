@@ -212,6 +212,23 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                         </div>
 
                     </div>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div id="map" style="height: 400px;"></div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div id="directions-panel"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="row">
                         <div class="col-md-6 grid-margin stretch-card">
                             <div class="card position-relative">
@@ -384,7 +401,112 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
     <script src="js/Chart.roundedBarCharts.js"></script>
     <!-- End custom js for this page-->
 
+    <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $_ENV["GOOGLE_MAPS_API_KEY"] ?>&libraries=routes&callback=initMap" async defer></script>
     <script>
+        // 1. Deklarasikan variabel penting di scope global agar bisa diakses antar fungsi
+        let map;
+        let directionsService;
+        let directionsRenderer;
+        let userLatitude = null;
+        let userLongitude = null;
+        const destinationLat = <?php echo $response_body['location']['latitude'] ?? 'null'; ?>;
+        const destinationLng = <?php echo $response_body['location']['longitude'] ?? 'null'; ?>;
+
+        // 2. Google akan memanggil fungsi ini HANYA JIKA API sudah siap
+        function initMap() {
+            // Inisialisasi layanan-layanan Google
+            directionsService = new google.maps.DirectionsService();
+            directionsRenderer = new google.maps.DirectionsRenderer();
+
+            // Inisialisasi peta dengan lokasi default (misal: lokasi tujuan)
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 12,
+                center: {
+                    lat: destinationLat || -6.2088,
+                    lng: destinationLng || 106.8456
+                },
+            });
+
+            // Hubungkan renderer ke peta dan panel
+            directionsRenderer.setMap(map);
+            directionsRenderer.setPanel(document.getElementById("directions-panel"));
+
+            // Setelah peta siap, coba gambar rute.
+            // Mungkin lokasi pengguna sudah ditemukan lebih dulu.
+            calculateAndDisplayRoute();
+        }
+
+        // 3. Geolocation API akan memanggil fungsi ini jika berhasil mendapatkan lokasi
+        function successCallback(position) {
+            // Simpan koordinat pengguna ke variabel global
+            userLatitude = position.coords.latitude;
+            userLongitude = position.coords.longitude;
+
+            // Setelah lokasi ditemukan, coba gambar rute.
+            // Mungkin peta sudah siap lebih dulu.
+            calculateAndDisplayRoute();
+        }
+
+        function errorCallback(error) {
+            console.warn(`ERROR(${error.code}): ${error.message}`);
+            // Jika lokasi gagal didapat, tetap coba gambar rute dari Jakarta (atau lokasi default lain)
+            // Anda bisa juga menampilkan pesan error kepada pengguna
+            alert("Tidak bisa mendapatkan lokasi Anda. Rute akan dihitung dari lokasi default.");
+            calculateAndDisplayRoute(); // Tetap panggil untuk menggambar rute dari default origin
+        }
+
+        // 4. Ini adalah fungsi utama untuk menggambar rute
+        function calculateAndDisplayRoute() {
+            // Fungsi ini hanya akan berjalan jika peta sudah siap (dipanggil dari initMap)
+            // dan akan menggunakan lokasi pengguna jika sudah tersedia.
+            if (!directionsService || !directionsRenderer) {
+                // Jika peta/layanan belum siap, jangan lakukan apa-apa.
+                return;
+            }
+
+            // Tentukan titik awal: gunakan lokasi pengguna jika ada, jika tidak gunakan lokasi default
+            const originCoords = {
+                lat: userLatitude || -6.2088, // Default: Jakarta
+                lng: userLongitude || 106.8456
+            };
+
+            // Pastikan lokasi tujuan valid
+            if (destinationLat === null || destinationLng === null) {
+                alert("Lokasi tujuan tidak valid.");
+                return;
+            }
+
+            const destinationCoords = {
+                lat: destinationLat,
+                lng: destinationLng
+            };
+
+            // Buat request
+            const request = {
+                origin: originCoords,
+                destination: destinationCoords,
+                travelMode: google.maps.TravelMode.DRIVING
+            };
+
+            // Kirim request
+            directionsService.route(request, (response, status) => {
+                if (status == 'OK') {
+                    directionsRenderer.setDirections(response);
+                } else {
+                    window.alert('Permintaan rute gagal karena: ' + status);
+                }
+            });
+        }
+
+        // 5. Minta lokasi pengguna saat halaman dimuat
+        if ('geolocation' in navigator) {
+            navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+        } else {
+            alert('Geolocation tidak didukung oleh browser ini. Rute akan dihitung dari lokasi default.');
+            // Panggil calculateAndDisplayRoute jika geolocation tidak didukung sama sekali
+            calculateAndDisplayRoute();
+        }
+
         $(document).ready(function() {
 
             // Use CSS transitions for smoother animation

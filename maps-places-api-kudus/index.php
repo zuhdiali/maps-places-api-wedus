@@ -171,6 +171,7 @@ $dotenv->load();
     <script src="js/Chart.roundedBarCharts.js"></script>
     <!-- End custom js for this page-->
 
+
     <script>
         const locationResult = document.getElementById('search-results');
 
