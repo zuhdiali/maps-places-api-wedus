@@ -1,3 +1,9 @@
+<?php
+require __DIR__ . '/vendor/autoload.php';
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+$dotenv->load();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -97,6 +103,11 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row mb-4" id="search-results-header">
+                        <div class="col">
+                            <h3>Rekomendasi Wisata Di Dekat Anda</h3>
+                        </div>
+                    </div>
                     <div class="row" id="search-results">
 
                     </div>
@@ -104,7 +115,7 @@
                         <div class="col">
                             <div class="d-flex justify-content-center mt-4">
                                 <button class="btn btn-outline-primary" id="next-page-btn" style="display:none;">
-                                    Halaman Berikutnya
+                                    Lihat Lebih Banyak
                                 </button>
                             </div>
                         </div>
@@ -161,9 +172,97 @@
     <!-- End custom js for this page-->
 
     <script>
+        const locationResult = document.getElementById('search-results');
+
+        // Cek apakah Geolocation didukung oleh browser
+        if ('geolocation' in navigator) {
+            locationResult.innerHTML = 'Meminta lokasi...';
+
+            // Panggil Geolocation API
+            navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+        } else {
+            locationResult.innerHTML = 'Maaf, browser Anda tidak mendukung Geolocation.';
+        }
+
+        // Fungsi callback jika berhasil mendapatkan lokasi
+        function successCallback(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+
+            $.ajax({
+                url: 'proxy-nearby-search.php',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    includedTypes: [
+                        "amusement_park",
+                        "aquarium",
+                        "cafe",
+                        "garden",
+                        "historical_landmark",
+                        "hiking_area",
+                        "internet_cafe",
+                        "library",
+                        "museum",
+                        "national_park",
+                        "opera_house",
+                        "park",
+                        "picnic_ground",
+                        "plaza",
+                        "planetarium",
+                        "roller_coaster",
+                        "tourist_attraction",
+                        "zoo",
+                    ],
+                    maxResultCount: 6,
+                    locationRestriction: {
+                        circle: {
+                            center: {
+                                latitude: latitude,
+                                longitude: longitude
+                            },
+                            radius: 500
+                        }
+
+                    }
+                }),
+                success: function(data) {
+                    renderResults(data);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('Request failed:', textStatus, errorThrown);
+                    locationResult.innerHTML = 'Terjadi kesalahan saat mengambil data lokasi.';
+                }
+            });
+
+        }
+
+        // Fungsi callback jika terjadi error
+        function errorCallback(error) {
+            let message = '';
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    message = "Akses lokasi ditolak oleh pengguna.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    message = "Informasi lokasi tidak tersedia.";
+                    break;
+                case error.TIMEOUT:
+                    message = "Permintaan lokasi timeout.";
+                    break;
+                default:
+                    message = "Terjadi error yang tidak diketahui.";
+                    break;
+            }
+            locationResult.innerHTML = message;
+        }
+    </script>
+    <script>
         $(document).ready(function() {
             $('#search-button').off('click').on('click', function() {
                 doSearch();
+                $('#search-results-header').empty();
+                $('#search-results-header').append('<div class="col"><h3>Hasil Pencarian untuk: <span class="text-primary">' + $('#search-input').val() + '</span></h3></div>');
             });
             $('#search-input').off('keydown').on('keydown', function(e) {
                 if (e.key === 'Enter') {
@@ -196,7 +295,7 @@
                         '<div class="card">' +
                         '<div class="card-body">' +
                         '<p class="card-title">' + item.displayName.text + '</p>' +
-                        '<img src="' + photoUrl + '" alt="Tempat Wisata" class="img-fluid rounded mb-3" />' +
+                        '<img src="' + photoUrl + '" alt="Tempat Wisata" class="img-fluid rounded mb-3" style="max-height:40vh; object-fit:cover; width:100%;" />' +
                         '<p class="text-black">' + (item.formattedAddress || 'Alamat tidak tersedia') + '</p>' +
                         '<p class="text-info"> <i class="mdi mdi-star"></i>  ' + (item.rating || '0') + '</p>' +
                         '<small class="text-black"> <i class="mdi mdi-google-maps"></i> Google Maps: <a href="' + item.googleMapsUri + '" target="_blank">Link</a></small>' +
@@ -207,7 +306,7 @@
                     );
                 });
             } else if (!append) {
-                $('#search-results').append('<li class="list-group-item">No results found.</li>');
+                $('#search-results').append('<li class="list-group-item">Tidak ada hasil yang ditemukan.</li>');
             }
         }
 
@@ -220,17 +319,17 @@
             }
             lastSearchTerm = searchTerm;
             let requestData = {
-                textQuery: searchTerm + ' Kudus',
+                textQuery: searchTerm + "<?php echo $_ENV['LOCATION'] ?>",
                 maxResultCount: 6,
                 locationRestriction: {
                     rectangle: {
                         low: {
-                            latitude: -6.977524096756523,
-                            longitude: 110.76088491043768
+                            latitude: <?php echo $_ENV['LOW_LATITUDE'] ?>,
+                            longitude: <?php echo $_ENV['LOW_LONGITUDE'] ?>
                         },
                         high: {
-                            latitude: -6.625091279772313,
-                            longitude: 110.9716421044049
+                            latitude: <?php echo $_ENV['HIGH_LATITUDE'] ?>,
+                            longitude: <?php echo $_ENV['HIGH_LONGITUDE'] ?>
                         }
                     }
                 }

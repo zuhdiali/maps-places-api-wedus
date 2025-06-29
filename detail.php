@@ -18,7 +18,7 @@ if ($var === 'default_value') {
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
         'X-Goog-Api-Key: ' . $apiKey,
-        'X-Goog-FieldMask: id,displayName,formattedAddress,location,rating,googleMapsUri,photos,nationalPhoneNumber,reviews'
+        'X-Goog-FieldMask: id,displayName,formattedAddress,location,rating,googleMapsUri,photos,nationalPhoneNumber,reviews,primaryType'
     ]);
     $response_body = curl_exec($ch);
     curl_close($ch);
@@ -39,19 +39,28 @@ if ($var === 'default_value') {
             'X-Goog-FieldMask: places.displayName,places.formattedAddress,places.id,places.location,places.rating,places.googleMapsUri,places.photos'
         ]);
         $request_data = [
+            "includedPrimaryTypes" => [
+                $response_body['primaryType'] ?? ''
+            ],
             "includedTypes" => [
                 "amusement_park",
                 "aquarium",
-                "roller_coaster",
+                "cafe",
+                "garden",
                 "historical_landmark",
                 "hiking_area",
+                "internet_cafe",
+                "library",
+                "museum",
+                "national_park",
                 "opera_house",
                 "park",
                 "picnic_ground",
                 "plaza",
                 "planetarium",
+                "roller_coaster",
                 "tourist_attraction",
-                "zoo"
+                "zoo",
             ],
             "maxResultCount" => 4,
             "locationRestriction" => [
@@ -60,7 +69,7 @@ if ($var === 'default_value') {
                         "latitude" => $lat,
                         "longitude" => $lng
                     ],
-                    "radius" => 500.0
+                    "radius" => 5000.0
                 ]
             ]
         ];
@@ -71,7 +80,6 @@ if ($var === 'default_value') {
 
         // Anda bisa memproses $response_body_terdekat sesuai kebutuhan
         $nearby_places = json_decode($response_body_terdekat, true);
-        echo "<script>console.log(" . json_encode($nearby_places) . ");</script>";
     }
 }
 
@@ -173,7 +181,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                                     <img
                                         src="<?php echo $response_body['photos']['0'] ?? 'images/dashboard/people.svg' ?>"
                                         alt="<?php echo $response_body["displayName"]["text"] ?? "Tempat Wisata" ?>"
-                                        class="img-fluid w-100" />
+                                        class="img-fluid w-100"
+                                        style="max-height:50vh; object-fit:cover;" />
                                 </div>
                             </div>
                         </div>
@@ -219,11 +228,11 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                                                     foreach ($response_body['photos'] as $index => $photo) {
                                                         if ($index == 1) {
                                                             echo '<div class="carousel-item active">
-                                                                <img src="' . $photo . '" alt="people" class="img-fluid rounded mx-auto d-block h-100" />
+                                                                <img src="' . $photo . '" alt="people" class="img-fluid rounded mx-auto d-block h-100" style="max-height:50vh; object-fit:cover;"  />
                                                             </div>';
                                                         } else {
                                                             echo '<div class="carousel-item">
-                                                                <img src="' . $photo . '" alt="people" class="img-fluid rounded mx-auto d-block h-100" />
+                                                                <img src="' . $photo . '" alt="people" class="img-fluid rounded mx-auto d-block h-100" style="max-height:50vh; object-fit:cover;"  />
                                                             </div>';
                                                         }
                                                     } ?>
@@ -288,7 +297,7 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                         <div class="col grid-margin">
                             <div class="row">
                                 <div class="col-12 col-xl-8 mt-4 mb-xl-0">
-                                    <h3 class="font-weight-bold">Wisata Yang Dekat Dengan <?php echo $response_body["displayName"]["text"] ?? "" ?></h3>
+                                    <h3 class="font-weight-bold">Wisata Yang Sejenis Dengan <?php echo $response_body["displayName"]["text"] ?? "" ?></h3>
                                 </div>
                             </div>
                         </div>
@@ -310,7 +319,7 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                                     '<div class="card">' .
                                     '<div class="card-body">' .
                                     '<p class="card-title">' . ($place["displayName"]["text"] ?? 'Tempat Wisata') . '</p>' .
-                                    '<img src="' . $photoUrl . '" alt="' . ($place["displayName"]["text"] ?? 'Tempat Wisata') . '" class="img-fluid rounded mb-3" />' .
+                                    '<img src="' . $photoUrl . '" alt="' . ($place["displayName"]["text"] ?? 'Tempat Wisata') . '" class="img-fluid rounded mb-3 d-block mx-auto" style="max-height:50vh; object-fit:cover;" />' .
                                     '<p class="text-black">' . ($place["formattedAddress"] ?? 'Alamat tidak tersedia') . '</p>' .
                                     '<p class="text-info"> <i class="mdi mdi-star"></i>   ' . ($place["rating"] ?? '0') . '</p>' .
                                     '<small class="text-black"><i class="mdi mdi-google-maps"></i>Google Maps: <a href="' . ($place["googleMapsUri"] ?? '#') . '" target="_blank">Link</a></small>' .
@@ -320,7 +329,7 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                                     '</div>';
                             }
                         } else {
-                            echo '<div class="col-md-12"><p>Tidak ada wisata terdekat yang ditemukan.</p></div>';
+                            echo '<div class="col-md-12"><p>Tidak ada wisata yang ditemukan.</p></div>';
                         }
                         ?>
                     </div>
