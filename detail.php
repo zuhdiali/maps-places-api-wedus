@@ -422,8 +422,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
             map = new google.maps.Map(document.getElementById("map"), {
                 zoom: 12,
                 center: {
-                    lat: destinationLat || -6.2088,
-                    lng: destinationLng || 106.8456
+                    lat: destinationLat || -6.807741995720486,
+                    lng: destinationLng || 110.8417126190582
                 },
             });
 
