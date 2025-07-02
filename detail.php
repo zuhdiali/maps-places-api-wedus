@@ -466,8 +466,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
 
             // Tentukan titik awal: gunakan lokasi pengguna jika ada, jika tidak gunakan lokasi default
             const originCoords = {
-                lat: userLatitude || -6.2088, // Default: Jakarta
-                lng: userLongitude || 106.8456
+                lat: userLatitude || -6.807741995720486, // Default: Jakarta
+                lng: userLongitude || 110.8417126190582
             };
 
             // Pastikan lokasi tujuan valid
