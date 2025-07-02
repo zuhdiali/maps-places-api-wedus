@@ -50,6 +50,3 @@ Thumbs.db
 
 .env
 
-bot-whatsapp-laundry/session/*
-bot-whatsapp-laundry/session_sebelumnya/*
-bot-whatsapp-laundry/node_modules/*
