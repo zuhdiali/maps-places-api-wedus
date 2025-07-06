@@ -1,16 +1,23 @@
 <?php
+// Memuat autoload Composer untuk menggunakan library eksternal seperti Dotenv
 require __DIR__ . '/vendor/autoload.php';
+
+// Memuat variabel lingkungan dari file .env
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-// Sekarang Anda bisa mengakses API Key
+// Mengambil API Key dari variabel lingkungan
 $apiKey = $_ENV['GOOGLE_PLACES_API_KEY'];
 $response_body = null;
-$var = $_GET['place_id'] ?? 'default_value';
+
+// Mengambil parameter place_id dari URL, jika tidak ada gunakan 'default_value'
+$var = $_GET['place_id'] ?? 'abc';
+
+// Jika place_id tidak ditemukan, tampilkan pesan error
 if ($var === 'default_value') {
     echo "Halaman tidak ditemukan. Silahkan kembali ke halaman sebelumnya.";
 } else {
-    // Ambil detail tempat dari Places API
+    // Membuat URL untuk mengambil detail tempat dari Google Places API
     $detail_url = 'https://places.googleapis.com/v1/places/' . $var . '?languageCode=id';
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $detail_url);
@@ -18,16 +25,20 @@ if ($var === 'default_value') {
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
         'Content-Type: application/json',
         'X-Goog-Api-Key: ' . $apiKey,
+        // FieldMask digunakan untuk membatasi data yang diambil agar lebih efisien
         'X-Goog-FieldMask: id,displayName,formattedAddress,location,rating,googleMapsUri,photos,nationalPhoneNumber,reviews,primaryType'
     ]);
     $response_body = curl_exec($ch);
     curl_close($ch);
 
-    // Ambil wisata terdekat jika lokasi tersedia
+    // Mengubah hasil response dari JSON menjadi array PHP
     $response_body = json_decode($response_body, true);
+
+    // Mengambil koordinat latitude dan longitude dari response
     $lat = $response_body['location']['latitude'] ?? null;
     $lng = $response_body['location']['longitude'] ?? null;
 
+    // Jika lokasi tersedia, ambil tempat wisata terdekat menggunakan Places API Nearby Search
     if ($lat && $lng) {
         $nearby_url = 'https://places.googleapis.com/v1/places:searchNearby';
         $ch = curl_init();
@@ -36,8 +47,10 @@ if ($var === 'default_value') {
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'X-Goog-Api-Key: ' . $apiKey,
+            // FieldMask membatasi data yang diambil pada response
             'X-Goog-FieldMask: places.displayName,places.formattedAddress,places.id,places.location,places.rating,places.googleMapsUri,places.photos'
         ]);
+        // Data request untuk pencarian tempat terdekat
         $request_data = [
             "includedPrimaryTypes" => [
                 $response_body['primaryType'] ?? ''
@@ -69,7 +82,7 @@ if ($var === 'default_value') {
                         "latitude" => $lat,
                         "longitude" => $lng
                     ],
-                    "radius" => 5000.0
+                    "radius" => 5000.0 // radius dalam meter
                 ]
             ]
         ];
@@ -78,18 +91,22 @@ if ($var === 'default_value') {
         $response_body_terdekat = curl_exec($ch);
         curl_close($ch);
 
-        // Anda bisa memproses $response_body_terdekat sesuai kebutuhan
+        // Mengubah hasil response dari JSON menjadi array PHP
         $nearby_places = json_decode($response_body_terdekat, true);
     }
 }
 
+// Mengolah data foto agar bisa langsung digunakan di tampilan
 $photos = [];
+// Jika ada foto dalam response, ambil nama dan buat URL untuk mengambil foto
 if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
     foreach ($response_body['photos'] as $photo) {
+        // Membuat URL untuk mengambil foto dari Google Places API melalui ambil-foto.php
         $photos[] = "ambil-foto.php?name=" . $photo["name"] . "&maxWidthPx=500";
     }
     $response_body['photos'] = $photos;
 } else {
+    // Jika tidak ada foto, gunakan gambar default
     $response_body['photos'] = ['images/dashboard/people.svg'];
 }
 ?>
@@ -403,7 +420,7 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
 
     <script src="https://maps.googleapis.com/maps/api/js?key=<?php echo $_ENV["GOOGLE_MAPS_API_KEY"] ?>&libraries=routes&callback=initMap" async defer></script>
     <script>
-        // 1. Deklarasikan variabel penting di scope global agar bisa diakses antar fungsi
+        // Variabel global
         let map;
         let directionsService;
         let directionsRenderer;
@@ -412,99 +429,79 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
         const destinationLat = <?php echo $response_body['location']['latitude'] ?? 'null'; ?>;
         const destinationLng = <?php echo $response_body['location']['longitude'] ?? 'null'; ?>;
 
-        // 2. Google akan memanggil fungsi ini HANYA JIKA API sudah siap
+        // Google akan memanggil ini saat API siap
         function initMap() {
-            // Inisialisasi layanan-layanan Google
+            // Inisialisasi peta dan layanan
+            map = new google.maps.Map(document.getElementById("map"), {
+                /* ... opsi peta ... */
+            });
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer();
-
-            // Inisialisasi peta dengan lokasi default (misal: lokasi tujuan)
-            map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 12,
-                center: {
-                    lat: destinationLat || -6.807741995720486,
-                    lng: destinationLng || 110.8417126190582
-                },
-            });
-
-            // Hubungkan renderer ke peta dan panel
             directionsRenderer.setMap(map);
             directionsRenderer.setPanel(document.getElementById("directions-panel"));
 
-            // Setelah peta siap, coba gambar rute.
-            // Mungkin lokasi pengguna sudah ditemukan lebih dulu.
+            // Coba gambar rute, mungkin lokasi sudah ada
             calculateAndDisplayRoute();
         }
 
-        // 3. Geolocation API akan memanggil fungsi ini jika berhasil mendapatkan lokasi
+        // Geolocation akan memanggil ini saat lokasi ditemukan
         function successCallback(position) {
-            // Simpan koordinat pengguna ke variabel global
             userLatitude = position.coords.latitude;
             userLongitude = position.coords.longitude;
-
-            // Setelah lokasi ditemukan, coba gambar rute.
-            // Mungkin peta sudah siap lebih dulu.
+            // Coba gambar rute, mungkin peta sudah siap
             calculateAndDisplayRoute();
         }
 
         function errorCallback(error) {
-            console.warn(`ERROR(${error.code}): ${error.message}`);
-            // Jika lokasi gagal didapat, tetap coba gambar rute dari Jakarta (atau lokasi default lain)
-            // Anda bisa juga menampilkan pesan error kepada pengguna
-            alert("Tidak bisa mendapatkan lokasi Anda. Rute akan dihitung dari lokasi default.");
-            calculateAndDisplayRoute(); // Tetap panggil untuk menggambar rute dari default origin
+            alert("Gagal mendapatkan lokasi. Rute tidak dapat ditampilkan.");
+            // Jangan panggil calculateAndDisplayRoute jika lokasi gagal didapat.
+            // Biarkan peta kosong atau tampilkan pesan.
         }
 
-        // 4. Ini adalah fungsi utama untuk menggambar rute
+        // Fungsi utama untuk menggambar rute
         function calculateAndDisplayRoute() {
-            // Fungsi ini hanya akan berjalan jika peta sudah siap (dipanggil dari initMap)
-            // dan akan menggunakan lokasi pengguna jika sudah tersedia.
-            if (!directionsService || !directionsRenderer) {
-                // Jika peta/layanan belum siap, jangan lakukan apa-apa.
-                return;
+            // ===================================================================
+            // INI ADALAH BAGIAN TERPENTING (KONDISI PENJAGA)
+            // ===================================================================
+            // Jangan lakukan apa-apa jika salah satu dari ini belum siap:
+            // 1. Peta dan layanan Google (map)
+            // 2. Lokasi pengguna (userLatitude)
+            // 3. Lokasi tujuan (destinationLat)
+            if (!map || userLatitude === null || destinationLat === null) {
+                console.log("Menunggu data peta atau lokasi...");
+                return; // Keluar dari fungsi dan tunggu panggilan berikutnya
             }
 
-            // Tentukan titik awal: gunakan lokasi pengguna jika ada, jika tidak gunakan lokasi default
             const originCoords = {
-                lat: userLatitude || -6.807741995720486, // Default: Jakarta
-                lng: userLongitude || 110.8417126190582
+                lat: userLatitude,
+                lng: userLongitude
             };
-
-            // Pastikan lokasi tujuan valid
-            if (destinationLat === null || destinationLng === null) {
-                alert("Lokasi tujuan tidak valid.");
-                return;
-            }
-
             const destinationCoords = {
                 lat: destinationLat,
                 lng: destinationLng
             };
 
-            // Buat request
             const request = {
                 origin: originCoords,
                 destination: destinationCoords,
                 travelMode: google.maps.TravelMode.DRIVING
             };
 
-            // Kirim request
             directionsService.route(request, (response, status) => {
                 if (status == 'OK') {
                     directionsRenderer.setDirections(response);
                 } else {
+                    // Error ini akan muncul jika rute benar-benar tidak ada (misal: menyeberangi lautan)
                     window.alert('Permintaan rute gagal karena: ' + status);
                 }
             });
         }
 
-        // 5. Minta lokasi pengguna saat halaman dimuat
+        // Minta lokasi pengguna saat halaman dimuat
         if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
         } else {
-            alert('Geolocation tidak didukung oleh browser ini. Rute akan dihitung dari lokasi default.');
-            // Panggil calculateAndDisplayRoute jika geolocation tidak didukung sama sekali
-            calculateAndDisplayRoute();
+            alert('Geolocation tidak didukung oleh browser ini.');
         }
 
         $(document).ready(function() {

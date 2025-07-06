@@ -173,15 +173,17 @@ $dotenv->load();
 
 
     <script>
+        // Ambil elemen hasil pencarian
         const locationResult = document.getElementById('search-results');
 
         // Cek apakah Geolocation didukung oleh browser
         if ('geolocation' in navigator) {
             locationResult.innerHTML = 'Meminta lokasi...';
 
-            // Panggil Geolocation API
+            // Panggil Geolocation API untuk mendapatkan lokasi pengguna
             navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
         } else {
+            // Jika browser tidak mendukung Geolocation
             locationResult.innerHTML = 'Maaf, browser Anda tidak mendukung Geolocation.';
         }
 
@@ -190,6 +192,7 @@ $dotenv->load();
             const latitude = position.coords.latitude;
             const longitude = position.coords.longitude;
 
+            // Kirim permintaan AJAX ke backend untuk mencari tempat wisata terdekat
             $.ajax({
                 url: 'proxy-nearby-search.php',
                 method: 'POST',
@@ -222,15 +225,16 @@ $dotenv->load();
                                 latitude: latitude,
                                 longitude: longitude
                             },
-                            radius: 500
+                            radius: 500 // Radius pencarian dalam meter
                         }
-
                     }
                 }),
                 success: function(data) {
+                    // Tampilkan hasil pencarian
                     renderResults(data);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
+                    // Tampilkan pesan error jika gagal
                     console.error('Request failed:', textStatus, errorThrown);
                     locationResult.innerHTML = 'Terjadi kesalahan saat mengambil data lokasi.';
                 }
@@ -238,7 +242,7 @@ $dotenv->load();
 
         }
 
-        // Fungsi callback jika terjadi error
+        // Fungsi callback jika terjadi error saat mengambil lokasi
         function errorCallback(error) {
             let message = '';
             switch (error.code) {
@@ -259,18 +263,23 @@ $dotenv->load();
         }
     </script>
     <script>
+        // Jalankan kode setelah dokumen siap
         $(document).ready(function() {
+            // Event saat tombol cari diklik
             $('#search-button').off('click').on('click', function() {
                 doSearch();
+                // Update judul hasil pencarian
                 $('#search-results-header').empty();
                 $('#search-results-header').append('<div class="col"><h3>Hasil Pencarian untuk: <span class="text-primary">' + $('#search-input').val() + '</span></h3></div>');
             });
+            // Event saat tombol Enter ditekan di input pencarian
             $('#search-input').off('keydown').on('keydown', function(e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
                     $('#search-button').click();
                 }
             });
+            // Event untuk tombol "Lihat Lebih Banyak"
             $('#next-page-btn').on('click', function() {
                 if (nextPageToken) {
                     doSearch(nextPageToken, true);
@@ -278,18 +287,22 @@ $dotenv->load();
             });
         });
 
+        // Variabel global untuk menyimpan token halaman berikutnya dan data pencarian terakhir
         let nextPageToken = null;
         let lastSearchTerm = '';
         let lastRequestData = {};
 
+        // Fungsi untuk menampilkan hasil pencarian ke halaman
         function renderResults(data, append = false) {
             if (!append) $('#search-results').empty();
             if (data.places && data.places.length > 0) {
                 data.places.forEach(function(item) {
+                    // Ambil URL foto jika tersedia, jika tidak gunakan gambar default
                     let photoUrl = item.photos ?
                         'ambil-foto.php?name=' + item.photos[0].name + '&maxWidthPx=470' :
                         'images/dashboard/people.svg';
 
+                    // Tambahkan hasil ke elemen search-results
                     $('#search-results').append(
                         '<div class="col-md-4 stretch-card grid-margin">' +
                         '<a href="detail.php?place_id=' + item.id + '" class="text-decoration-none">' +
@@ -307,18 +320,22 @@ $dotenv->load();
                     );
                 });
             } else if (!append) {
+                // Jika tidak ada hasil, tampilkan pesan
                 $('#search-results').append('<li class="list-group-item">Tidak ada hasil yang ditemukan.</li>');
             }
         }
 
+        // Fungsi untuk melakukan pencarian berdasarkan input pengguna
         function doSearch(pageToken = null, append = false) {
             var searchTerm = $('#search-input').val().toLowerCase();
             if (!searchTerm) {
+                // Jika input kosong, tampilkan pesan
                 $('#search-results').empty().append('<li class="list-group-item">Tolong masukkan kode pencarian.</li>');
                 $('#next-page-btn').hide();
                 return;
             }
             lastSearchTerm = searchTerm;
+            // Siapkan data request untuk dikirim ke backend
             let requestData = {
                 textQuery: searchTerm + "<?php echo $_ENV['LOCATION'] ?>",
                 maxResultCount: 6,
@@ -337,13 +354,16 @@ $dotenv->load();
             };
             if (pageToken) requestData.pageToken = pageToken;
             lastRequestData = requestData;
+            // Kirim permintaan AJAX ke backend
             $.ajax({
                 url: 'proxy.php',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(requestData),
                 success: function(data) {
+                    // Tampilkan hasil pencarian
                     renderResults(data, append);
+                    // Simpan token untuk halaman berikutnya jika ada
                     nextPageToken = data.nextPageToken || null;
                     if (nextPageToken) {
                         $('#next-page-btn').show();
@@ -352,14 +372,14 @@ $dotenv->load();
                     }
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
+                    // Tampilkan pesan error jika gagal
                     console.error('Request failed:', textStatus, errorThrown);
                     $('#next-page-btn').hide();
                 }
             });
         }
 
-
-        // Use CSS transitions for smoother animation
+        // Animasi hover pada kartu hasil pencarian agar lebih interaktif
         $('#search-results').on('mouseenter', '.card', function() {
             $(this).css({
                 'transition': 'box-shadow 0.2s, transform 0.2s',
