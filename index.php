@@ -1,4 +1,5 @@
 <?php
+// Untuk membaca file .env
 require __DIR__ . '/vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
@@ -10,16 +11,22 @@ $dotenv->load();
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8" />
+
+    <!-- Untuk mengatur scale web -->
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Untuk mengatur tulisan yang ada di tab browser -->
     <title>Wisata Kabupaten Kudus</title>
+
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/feather/feather.css" />
     <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css" />
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css" />
     <!-- endinject -->
-    <!-- Plugin css for this page -->
+
+    <!-- Plugin css for this page (untuk styling website) -->
     <link
         rel="stylesheet"
         href="vendors/datatables.net-bs4/dataTables.bootstrap4.css" />
@@ -31,21 +38,28 @@ $dotenv->load();
 
     <link rel="stylesheet" href="vendors/mdi/css/materialdesignicons.min.css">
     <!-- End plugin css for this page -->
+
     <!-- inject:css -->
     <link rel="stylesheet" href="css/vertical-layout-light/style.css" />
     <!-- endinject -->
+
+    <!-- Untuk mengubah logo yang ada di tab browser -->
     <link rel="shortcut icon" href="images/logo-mini.png" />
 </head>
 
 <body>
     <div class="container-scroller">
+
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
-            <div
-                class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
+
+            <!-- baris di bawah ini untuk mengganti LOGO navigasi yang ada di kiri atas web -->
+            <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
                 <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/logo.png" class="mr-2" alt="logo" /></a>
                 <a class="navbar-brand brand-logo-mini" href="index.php"><img src="images/logo-mini.png" alt="logo" /></a>
             </div>
+
+            <!-- kalau ingin menambah navigasi di web bagian atas, lakukan pengubahan di sini -->
             <div
                 class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
                 <ul class="navbar-nav mr-lg-2">
@@ -55,6 +69,8 @@ $dotenv->load();
                     </li>
                 </ul>
                 <ul class="navbar-nav navbar-nav-right"></ul>
+
+                <!-- baris di bawah ini akan muncul jika website dibuka dari hp, yaitu berupa garis tiga di kanan atas -->
                 <button
                     class="navbar-toggler navbar-toggler-right d-lg-none align-self-center"
                     type="button"
@@ -64,6 +80,7 @@ $dotenv->load();
             </div>
         </nav>
         <!-- partial -->
+
         <div class="container-fluid page-body-wrapper">
 
             <!-- partial -->
@@ -71,24 +88,33 @@ $dotenv->load();
             <!-- partial -->
             <div class="main-panel">
                 <div class="content-wrapper">
+
+                    <!-- Baris kode di bawah ini untuk menampilkan tulisan Selamat Datang -->
                     <div class="row">
+
+                        <!-- Delapan baris kode ini tidak boleh dipisah, harus selalu nyambung seperti di bawah. Kalau mau digeser, geser ketujuh baris sekaligus -->
                         <div class="col-md-12 grid-margin">
                             <div class="row">
                                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
+                                    <!-- Baris kode di bawah ini untuk mengganti tulisan -->
                                     <h3 class="font-weight-bold">Selamat Datang di Wisata Kabupaten Kudus</h3>
-                                    <!-- <h6 class="font-weight-normal mb-0">
-                      Cari informasi tempat wisata di
-                      <span class="text-primary">Kudus!</span>
-                    </h6> -->
                                 </div>
                             </div>
                         </div>
+
                     </div>
+
+
                     <div class="row">
+
+                        <!-- Baris kode di bawah ini untuk menampilkan kotak untuk input pencarian. Kalau mau digeser sekalian sampai baris ke 135 -->
                         <div class="col grid-margin">
                             <div class="card">
                                 <div class="card-body">
+                                    <!-- yang di bawah ini untuk mengganti tulisan -->
                                     <h4 class="card-title">Cari Tempat Wisata di Kudus</h4>
+
+                                    <!-- yang di bawah ini untuk menampilkan kotak input pencarian. Kalau mau digeser sekalian dari baris 115 sampai 121-->
                                     <div class="form-group">
                                         <input
                                             type="text"
@@ -96,21 +122,31 @@ $dotenv->load();
                                             placeholder="Ketik di sini untuk mencari..."
                                             id="search-input" />
                                     </div>
+
+                                    <!-- ini tombol Cari yang berwarna ungu -->
                                     <button class="btn btn-primary" id="search-button">
                                         Cari
                                     </button>
+
                                 </div>
                             </div>
                         </div>
+
                     </div>
+
+                    <!-- Baris kode di bawah ini untuk menampilkan hasil pencarian -->
                     <div class="row mb-4" id="search-results-header">
                         <div class="col">
                             <h3>Rekomendasi Wisata Di Dekat Anda</h3>
                         </div>
                     </div>
+
+                    <!-- hasil hasil pencarian akan ditampilkan di sini -->
                     <div class="row" id="search-results">
 
                     </div>
+
+                    <!-- Tombol untuk melihat lebih banyak hasil pencarian. Tombol ini akan hilang jika hasil pencariannya tidak lebih dari 6-->
                     <div class="row">
                         <div class="col">
                             <div class="d-flex justify-content-center mt-4">
@@ -122,7 +158,9 @@ $dotenv->load();
                     </div>
                 </div>
                 <!-- content-wrapper ends -->
-                <!-- partial:partials/_footer.html -->
+
+
+                <!-- footer tidak usah dipindah-pindah -->
                 <footer class="footer">
                     <div
                         class="d-sm-flex justify-content-center justify-content-sm-between">
@@ -149,6 +187,9 @@ $dotenv->load();
     </div>
     <!-- container-scroller -->
 
+    <!-- ---------------------------------------------------------------- -->
+    <!-- MULAI BARIS INI SAMPAI KE BAWAH HANYA NGEFEK SEDIKIT KE TAMPILAN -->
+    <!-- ---------------------------------------------------------------- -->
     <!-- plugins:js -->
     <script src="vendors/js/vendor.bundle.base.js"></script>
     <!-- endinject -->
@@ -218,8 +259,8 @@ $dotenv->load();
                         "tourist_attraction",
                         "zoo",
                     ],
-                    maxResultCount: 6,
-                    locationRestriction: {
+                    maxResultCount: 6, // Batas jumlah hasil wisata terdekat yang ditampilkan. Jika ingin menampilkan lebih banyak/sedikit, ubah nilainya
+                    locationRestriction: { // Batas lokasi pencarian. Disesuaikan dengan wilayah Kabupaten Kudus
                         circle: {
                             center: {
                                 latitude: latitude,
@@ -327,6 +368,7 @@ $dotenv->load();
 
         // Fungsi untuk melakukan pencarian berdasarkan input pengguna
         function doSearch(pageToken = null, append = false) {
+            // menangkap input kalimas yang ditulis dari pengguna, disimpan dalam variabel searchTerm
             var searchTerm = $('#search-input').val().toLowerCase();
             if (!searchTerm) {
                 // Jika input kosong, tampilkan pesan
@@ -337,8 +379,8 @@ $dotenv->load();
             lastSearchTerm = searchTerm;
             // Siapkan data request untuk dikirim ke backend
             let requestData = {
-                textQuery: searchTerm + "<?php echo $_ENV['LOCATION'] ?>",
-                maxResultCount: 6,
+                textQuery: searchTerm + "<?php echo $_ENV['LOCATION'] ?>", // Tambahkan lokasi Kabupaten Kudus ke query
+                maxResultCount: 6, // Batas jumlah hasil wisata relevan yang ditampilkan. Jika ingin menampilkan lebih banyak/sedikit, ubah nilainya
                 locationRestriction: {
                     rectangle: {
                         low: {
@@ -352,6 +394,7 @@ $dotenv->load();
                     }
                 }
             };
+            // Jika ada token halaman sebelumnya, tambahkan ke requestData. Ini menandakan bahwa hasil pencarian ada banyak. Sebelumnya kita ambil 6 dulu
             if (pageToken) requestData.pageToken = pageToken;
             lastRequestData = requestData;
             // Kirim permintaan AJAX ke backend
