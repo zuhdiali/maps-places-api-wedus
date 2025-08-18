@@ -75,7 +75,7 @@ if ($var === 'default_value') {
                 "tourist_attraction",
                 "zoo",
             ],
-            "maxResultCount" => 4,
+            "maxResultCount" => 4,  // Batas jumlah hasil wisata relevan yang ditampilkan. Jika ingin menampilkan lebih banyak/sedikit, ubah nilainya
             "locationRestriction" => [
                 "circle" => [
                     "center" => [
@@ -120,12 +120,16 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Untuk mengubah tulisan yang ada di tab browser -->
     <title><?php echo $response_body["displayName"]["text"] ?? "Tempat Wisata Tidak Ditemukan" ?></title>
+
     <!-- plugins:css -->
     <link rel="stylesheet" href="vendors/feather/feather.css" />
     <link rel="stylesheet" href="vendors/ti-icons/css/themify-icons.css" />
     <link rel="stylesheet" href="vendors/css/vendor.bundle.base.css" />
     <!-- endinject -->
+
     <!-- Plugin css for this page -->
     <link
         rel="stylesheet"
@@ -137,9 +141,12 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
         href="js/select.dataTables.min.css" />
     <link rel="stylesheet" href="vendors/mdi/css/materialdesignicons.min.css">
     <!-- End plugin css for this page -->
+
     <!-- inject:css -->
     <link rel="stylesheet" href="css/vertical-layout-light/style.css" />
     <!-- endinject -->
+
+    <!-- Untuk mengubah logo yang ada di tab browser -->
     <link rel="shortcut icon" href="images/logo-mini.png" />
 </head>
 
@@ -147,11 +154,15 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
     <div class="container-scroller">
         <!-- partial:partials/_navbar.html -->
         <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+
+            <!-- baris di bawah ini untuk mengganti LOGO navigasi yang ada di kiri atas web -->
             <div
                 class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-center">
                 <a class="navbar-brand brand-logo mr-5" href="index.php"><img src="images/logo.png" class="mr-2" alt="logo" /></a>
                 <a class="navbar-brand brand-logo-mini" href="index.php"><img src="images/logo-mini.png" alt="logo" /></a>
             </div>
+
+            <!-- kalau ingin menambah navigasi di web bagian atas, lakukan pengubahan di sini -->
             <div
                 class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
 
@@ -162,6 +173,9 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                     </li>
                 </ul>
                 <ul class="navbar-nav navbar-nav-right"></ul>
+
+
+                <!-- baris di bawah ini akan muncul jika website dibuka dari hp, yaitu berupa garis tiga di kanan atas -->
                 <button
                     class="navbar-toggler navbar-toggler-right d-lg-none align-self-center"
                     type="button"
@@ -180,6 +194,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
             <div class="main-panel">
                 <div class="content-wrapper">
                     <div class="row">
+
+                        <!-- Baris kode ini akan menampilkan nama wisata di atas -->
                         <div class="col-md-6 grid-margin">
                             <div class="row">
                                 <div class="col-12 col-xl-8 mb-4 mb-xl-0">
@@ -193,6 +209,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
 
                     <!-- INI DIV CLASS ROW ISINYA GAMBAR SAMA RINCIAN TEMPAT -->
                     <div class="row">
+
+                        <!-- menampilkan sebuah gambar wisata kalau mau digeser sekalian sampai baris ke 223-->
                         <div class="col-md-6 col grid-margin stretch-card">
                             <div class="card bg-transparent text-center">
                                 <div class="card-people p-0 d-flex justify-content-center align-items-center" style="height:100%;">
@@ -204,6 +222,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                                 </div>
                             </div>
                         </div>
+
+                        <!-- menampilkan informasi mengenai rincian tempat wisata kalau mau digeser semua informasinya, sekalian geser sampai penutup </div> -->
                         <div class="col-md-6 grid-margin transparent">
                             <div class="row">
                                 <div class="col grid-margin stretch-card">
@@ -237,12 +257,17 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                             <div class="card">
                                 <div class="card-body">
                                     <div class="row">
+
+                                        <!-- ini nanti menampilkan rute dalam peta/ Kalau mau digeser sekalian tiga baris kodenya, jangan dipisah-pisah -->
                                         <div class="col-md-6">
                                             <div id="map" style="height: 400px;"></div>
                                         </div>
+
+                                        <!-- ini nanti menampilkan petunjuk arah dari lokasi pengguna ke tempat wisata. Kalau mau digeser sekalian 3 baris kodenya -->
                                         <div class="col-md-6">
                                             <div id="directions-panel"></div>
                                         </div>
+
                                     </div>
 
                                 </div>
@@ -252,11 +277,12 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
 
                     <!-- INI DIV CLASS ROW ISINYA FOTO-FOTO SAMA REVIEW -->
                     <div class="row">
+
+                        <!-- baris di bawah ini akan muncul jika website dibuka dari hp, yaitu berupa garis tiga di kanan atas -->
                         <div class="col-md-6 grid-margin stretch-card">
                             <div class="card position-relative">
                                 <div class="card-body">
                                     <div class="row">
-
                                         <div class="col">
                                             <div
                                                 id="detailedReports"
@@ -303,6 +329,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                                 </div>
                             </div>
                         </div>
+
+                        <!-- baris kode di bawah ini menampilkan hasil-hasil review -->
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body">
@@ -331,6 +359,7 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                                 </div>
                             </div>
                         </div>
+
                     </div>
 
                     <!-- INI DIV CLASS ISINYA TULISAN SAJA WISATA YANG SEJENIS -->
@@ -342,7 +371,6 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                     <!-- INI DIV CLASS ISINYA WISATA-WISATA YANG SEJENIS -->
@@ -482,21 +510,26 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                 return; // Keluar dari fungsi dan tunggu panggilan berikutnya
             }
 
+            // koordinat asal (pengguna)
             const originCoords = {
                 lat: userLatitude,
                 lng: userLongitude
             };
+
+            // koordinat tujuan (wisata)
             const destinationCoords = {
                 lat: destinationLat,
                 lng: destinationLng
             };
 
+            // Buat permintaan rute
             const request = {
                 origin: originCoords,
                 destination: destinationCoords,
                 travelMode: google.maps.TravelMode.DRIVING
             };
 
+            // Panggil layanan rute untuk mendapatkan rute
             directionsService.route(request, (response, status) => {
                 if (status == 'OK') {
                     directionsRenderer.setDirections(response);
