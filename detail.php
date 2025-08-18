@@ -191,6 +191,7 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                     </div>
 
 
+                    <!-- INI DIV CLASS ROW ISINYA GAMBAR SAMA RINCIAN TEMPAT -->
                     <div class="row">
                         <div class="col-md-6 col grid-margin stretch-card">
                             <div class="card bg-transparent text-center">
@@ -229,6 +230,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                         </div>
 
                     </div>
+
+                    <!-- INI DIV CLASS ROW ISINYA PETA SAMA RUTE -->
                     <div class="row mb-4">
                         <div class="col">
                             <div class="card">
@@ -246,6 +249,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                             </div>
                         </div>
                     </div>
+
+                    <!-- INI DIV CLASS ROW ISINYA FOTO-FOTO SAMA REVIEW -->
                     <div class="row">
                         <div class="col-md-6 grid-margin stretch-card">
                             <div class="card position-relative">
@@ -327,6 +332,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                             </div>
                         </div>
                     </div>
+
+                    <!-- INI DIV CLASS ISINYA TULISAN SAJA WISATA YANG SEJENIS -->
                     <div class="row">
                         <div class="col grid-margin">
                             <div class="row">
@@ -337,6 +344,8 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                         </div>
 
                     </div>
+
+                    <!-- INI DIV CLASS ISINYA WISATA-WISATA YANG SEJENIS -->
                     <div class="row" id="nearby-places">
                         <?php
                         if (isset($nearby_places['places']) && count($nearby_places['places']) > 0) {
@@ -367,6 +376,7 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                         }
                         ?>
                     </div>
+
                 </div>
                 <!-- content-wrapper ends -->
                 <!-- partial:partials/_footer.html -->
