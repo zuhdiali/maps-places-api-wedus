@@ -293,11 +293,11 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                                                     foreach ($response_body['photos'] as $index => $photo) {
                                                         if ($index == 1) {
                                                             echo '<div class="carousel-item active">
-                                                                <img src="' . $photo . '" alt="people" class="img-fluid rounded mx-auto d-block h-100" style="max-height:50vh; object-fit:cover;"  />
+                                                                <img src="' . $photo . '" alt="people" class="img-fluid rounded mx-auto d-block h-100" style="max-height:50vh; width:90%; object-fit:cover;"  />
                                                             </div>';
                                                         } else {
                                                             echo '<div class="carousel-item">
-                                                                <img src="' . $photo . '" alt="people" class="img-fluid rounded mx-auto d-block h-100" style="max-height:50vh; object-fit:cover;"  />
+                                                                <img src="' . $photo . '" alt="people" class="img-fluid rounded mx-auto d-block h-100" style="max-height:50vh; width:90%; object-fit:cover;"  />
                                                             </div>';
                                                         }
                                                     } ?>
@@ -390,7 +390,7 @@ if (isset($response_body['photos']) && count($response_body['photos']) > 0) {
                                     '<div class="card">' .
                                     '<div class="card-body">' .
                                     '<p class="card-title">' . ($place["displayName"]["text"] ?? 'Tempat Wisata') . '</p>' .
-                                    '<img src="' . $photoUrl . '" alt="' . ($place["displayName"]["text"] ?? 'Tempat Wisata') . '" class="img-fluid rounded mb-3 d-block mx-auto" style="max-height:50vh; object-fit:cover;" />' .
+                                    '<img src="' . $photoUrl . '" alt="' . ($place["displayName"]["text"] ?? 'Tempat Wisata') . '" class="img-fluid rounded mb-3 d-block mx-auto" style="width:100%; height:35vh; object-fit:cover;" />' .
                                     '<p class="text-black">' . ($place["formattedAddress"] ?? 'Alamat tidak tersedia') . '</p>' .
                                     '<p class="text-info"> <i class="mdi mdi-star"></i>   ' . ($place["rating"] ?? '0') . '</p>' .
                                     '<small class="text-black"><i class="mdi mdi-google-maps"></i>Google Maps: <a href="' . ($place["googleMapsUri"] ?? '#') . '" target="_blank">Link</a></small>' .

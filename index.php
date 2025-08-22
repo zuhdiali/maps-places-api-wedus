@@ -123,6 +123,26 @@ $dotenv->load();
                                             id="search-input" />
                                     </div>
 
+                                    <div class="form-group d-flex align-items-center">
+                                        <label class="mr-3 mb-0">Jenis Wisata:</label>
+                                        <div class="form-check form-check-inline mb-0 d-flex align-items-center">
+                                            <input class="form-check-input" type="radio" name="jenis_wisata" id="wisata_semua" value="semua" checked>
+                                            <label class="form-check-label m-0" for="wisata_semua">Semua</label>
+                                        </div>
+                                        <div class="form-check form-check-inline mb-0 d-flex align-items-center">
+                                            <input class="form-check-input" type="radio" name="jenis_wisata" id="wisata_alam" value="wisata alam">
+                                            <label class="form-check-label m-0" for="wisata_alam">Alam</label>
+                                        </div>
+                                        <div class="form-check form-check-inline mb-0 d-flex align-items-center">
+                                            <input class="form-check-input" type="radio" name="jenis_wisata" id="wisata_budaya" value="wisata budaya">
+                                            <label class="form-check-label m-0" for="wisata_budaya">Budaya</label>
+                                        </div>
+                                        <div class="form-check form-check-inline mb-0 d-flex align-items-center">
+                                            <input class="form-check-input" type="radio" name="jenis_wisata" id="wisata_kuliner" value="wisata kuliner">
+                                            <label class="form-check-label m-0" for="wisata_kuliner">Kuliner</label>
+                                        </div>
+                                    </div>
+
                                     <!-- ini tombol Cari yang berwarna ungu -->
                                     <button class="btn btn-primary" id="search-button">
                                         Cari
@@ -350,7 +370,7 @@ $dotenv->load();
                         '<div class="card">' +
                         '<div class="card-body">' +
                         '<p class="card-title">' + item.displayName.text + '</p>' +
-                        '<img src="' + photoUrl + '" alt="Tempat Wisata" class="img-fluid rounded mb-3" style="max-height:40vh; object-fit:cover; width:100%;" />' +
+                        '<img src="' + photoUrl + '" alt="Tempat Wisata" class="img-fluid rounded mb-3" style="height:35vh; object-fit:cover; width:100%;" />' +
                         '<p class="text-black">' + (item.formattedAddress || 'Alamat tidak tersedia') + '</p>' +
                         '<p class="text-info"> <i class="mdi mdi-star"></i>  ' + (item.rating || '0') + '</p>' +
                         '<small class="text-black"> <i class="mdi mdi-google-maps"></i> Google Maps: <a href="' + item.googleMapsUri + '" target="_blank">Link</a></small>' +
@@ -375,6 +395,12 @@ $dotenv->load();
                 $('#search-results').empty().append('<li class="list-group-item">Tolong masukkan kode pencarian.</li>');
                 $('#next-page-btn').hide();
                 return;
+            }
+            var jenisWisata = $('input[name="jenis_wisata"]:checked').val();
+            if (jenisWisata !== 'semua') {
+                // Jika jenis wisata tidak "semua", tambahkan filter ke searchTerm
+                searchTerm = jenisWisata + ' ' + searchTerm;
+                console.log('Jenis wisata yang dipilih:', searchTerm);
             }
             lastSearchTerm = searchTerm;
             // Siapkan data request untuk dikirim ke backend
